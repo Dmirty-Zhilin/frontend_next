@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> | DropAnalyzer</title>
+    <title><%= typeof title !== 'undefined' ? title : 'Главная' %> | DropAnalyzer</title>
     
     <!-- Инлайновые стили для гарантированного отображения -->
     <style>
@@ -154,13 +154,13 @@
     <!-- Шрифты -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Chart.js через CDN -->
+    <!-- React и Chart.js через CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Основной JavaScript -->
     <script src="/js/main.js" defer></script>
-    <script src="/js/components/charts.js" defer></script>
-    <script src="/js/components/analysis.js" defer></script>
 </head>
 <body>
     <header class="main-header">

@@ -1,19 +1,4 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> | Анализатор дропов</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/themes/<%= theme %>.css">
-    <!-- React и Material UI будут загружены через CDN для упрощения -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="theme-<%= theme %>">
-    <%- include('partials/header') %>
+<%- include('partials/header', { title: title }) %>
     
     <main class="container">
         <div class="hero-section">
@@ -79,6 +64,3 @@
     <%- include('partials/footer') %>
     
     <script src="/js/main.js"></script>
-    <script src="/js/dist/bundle.js"></script>
-</body>
-</html>

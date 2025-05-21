@@ -29,11 +29,15 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://unpkg.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net", "data:"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://api.example.com"]
+      connectSrc: ["'self'", "https://api.example.com", process.env.API_URL || "http://localhost:8005"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"]
     }
-  }
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 app.use(compression());
 app.use(cors());
@@ -49,19 +53,16 @@ app.use(session({
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
-// Middleware для правильных MIME-типов - ПЕРЕМЕЩЕНО ВЫШЕ express.static
-app.use((req, res, next) => {
-  const url = req.url;
-  if (url.endsWith('.js')) {
-    res.type('application/javascript');
-  } else if (url.endsWith('.css')) {
-    res.type('text/css');
+// Статические файлы с абсолютным путем и правильными MIME-типами
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
   }
-  next();
-});
-
-// Статические файлы с абсолютным путем
-app.use(express.static(path.join(__dirname, 'public')));
+}));
 
 // Middleware для передачи переменных во все шаблоны
 app.use((req, res, next) => {
