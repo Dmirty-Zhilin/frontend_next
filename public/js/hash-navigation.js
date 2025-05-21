@@ -27,6 +27,14 @@ function initHashNavigation() {
     
     // Добавляем обработчик клика для всех внутренних ссылок
     link.addEventListener('click', function(e) {
+      // Проверяем, не является ли ссылка уже активной
+      if (this.classList.contains('active')) {
+        // Если ссылка уже активна, просто предотвращаем действие по умолчанию
+        // и не меняем хеш, чтобы избежать добавления #страница
+        e.preventDefault();
+        return;
+      }
+      
       e.preventDefault();
       
       // Получаем путь из href
@@ -46,13 +54,13 @@ function initHashNavigation() {
       console.log('Переход по хеш-ссылке:', path);
       
       // Устанавливаем хеш для навигации
-      window.location.hash = '#' + path;
+      window.location.hash = path; // Убираем дополнительный символ # перед path
     });
   });
   
   // Если хеш не установлен, устанавливаем его на главную страницу
   if (!window.location.hash) {
-    window.location.hash = '#home';
+    window.location.hash = 'home'; // Убираем дополнительный символ # перед home
   }
 }
 
@@ -64,7 +72,7 @@ function handleHashChange() {
   // Если хеш пустой, устанавливаем его на главную страницу
   if (!hash) {
     hash = 'home';
-    window.location.hash = '#' + hash;
+    window.location.hash = hash; // Убираем дополнительный символ # перед hash
     return;
   }
   

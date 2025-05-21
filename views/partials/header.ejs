@@ -136,15 +136,6 @@
         .btn-primary:hover {
             background-color: var(--accent-hover);
         }
-
-        /* Темная тема */
-        [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2c2c2c;
-            --text-primary: #f0f0f0;
-            --text-secondary: #b0b0b0;
-            --border-color: #444444;
-        }
     </style>
     
     <!-- Внешние стили (оставляем для совместимости) -->
@@ -163,9 +154,11 @@
     <script src="/js/main.js" defer></script>
     <!-- Хеш-навигация для SPA -->
     <script src="/js/hash-navigation.js" defer></script>
+    <!-- Переключатель темы -->
+    <script src="/js/theme-switcher.js" defer></script>
 </head>
-<body>
-    <header class="main-header">
+<body data-theme="<%= theme %>" class="theme-dependent">
+    <header class="main-header theme-dependent">
         <div class="container">
             <a href="/" class="logo">DropAnalyzer</a>
             <nav class="main-nav">
@@ -178,8 +171,8 @@
                 </ul>
             </nav>
             <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
-                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon"><%= theme === 'light' ? '🌙' : '☀️' %></span>
             </button>
         </div>
     </header>
-    <main class="main-content">
+    <main class="main-content theme-dependent">

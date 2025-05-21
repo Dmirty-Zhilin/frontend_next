@@ -9,7 +9,7 @@ const API_URL = process.env.API_URL || 'http://backend:8005';
 router.get('/', async (req, res ) => {
   try {
     const { page, limit } = req.query;
-    const response = await axios.get(`${API_URL}/api/reports`, {
+    const response = await axios.get(`${API_URL}/api/v1/reports`, {
       params: { page, limit }
     });
     res.json(response.data);
@@ -26,7 +26,7 @@ router.get('/', async (req, res ) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const response = await axios.get(`${API_URL}/api/reports/${id}`);
+    const response = await axios.get(`${API_URL}/api/v1/reports/${id}`);
     res.json(response.data);
   } catch (error) {
     console.error('Ошибка при получении отчета:', error.message);
@@ -41,7 +41,7 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/export/:format', async (req, res) => {
   try {
     const { id, format } = req.params;
-    const response = await axios.get(`${API_URL}/api/reports/${id}/export/${format}`, {
+    const response = await axios.get(`${API_URL}/api/v1/reports/${id}/export/${format}`, {
       responseType: 'arraybuffer'
     });
     
@@ -67,7 +67,7 @@ router.get('/:id/export/:format', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const response = await axios.delete(`${API_URL}/api/reports/${id}`);
+    const response = await axios.delete(`${API_URL}/api/v1/reports/${id}`);
     res.json(response.data);
   } catch (error) {
     console.error('Ошибка при удалении отчета:', error.message);
