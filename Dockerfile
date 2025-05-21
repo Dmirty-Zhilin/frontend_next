@@ -11,8 +11,6 @@ RUN npm install --production
 # Копирование остальных файлов проекта
 COPY . .
 
-RUN npm install express-ejs-layouts --no-save
-
 # Создание директории для загрузок
 RUN mkdir -p uploads && chmod 777 uploads
 
