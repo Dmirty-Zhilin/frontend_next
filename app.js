@@ -113,3 +113,6 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 module.exports = app;
+
+// Тестовый маршрут для проверки стилей
+app.use('/test-styles', require('./routes/test-styles'));
