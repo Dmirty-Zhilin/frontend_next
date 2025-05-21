@@ -88,10 +88,11 @@ function handleHashChange() {
 
 // Загрузка контента на основе хеша
 function loadContent(hash) {
-  // Определяем URL для загрузки контента
-  let url = '/api/content/' + hash;
+  // Разбиваем хеш на части для обработки вложенных путей
+  const hashParts = hash.split('/');
+  const mainSection = hashParts[0];
   
-  // Для демонстрации используем маппинг хешей на реальные пути
+  // Маппинг основных разделов на реальные пути
   const hashToPath = {
     'home': '/',
     'dashboard': '/dashboard',
@@ -100,17 +101,27 @@ function loadContent(hash) {
     'ai-agents': '/ai-agents'
   };
   
-  // Если есть маппинг для хеша, используем его
-  if (hashToPath[hash]) {
-    url = hashToPath[hash];
+  // Определяем базовый URL для загрузки контента
+  let url;
+  
+  // Если это один из основных разделов, используем прямой путь
+  if (hashToPath[mainSection]) {
+    url = hashToPath[mainSection];
+    
+    // Если есть подразделы (например, reports/report-001), добавляем их к URL
+    if (hashParts.length > 1) {
+      // Добавляем остальные части пути, но не через /api/content/
+      url += '/' + hashParts.slice(1).join('/');
+    }
+  } else {
+    // Для неизвестных разделов используем корневой путь
+    url = '/';
   }
   
   // Логируем URL для отладки
   console.log('Загрузка контента с URL:', url);
   
-  // Для демонстрации просто перенаправляем на соответствующую страницу
-  // В реальном SPA здесь был бы AJAX-запрос для загрузки контента
-  // без перезагрузки страницы
+  // Проверяем, отличается ли текущий путь от целевого
   if (url !== window.location.pathname) {
     // Сохраняем текущий хеш
     const currentHash = window.location.hash;
@@ -128,6 +139,9 @@ function updateActiveMenuItem(hash) {
   // Получаем все пункты меню
   const menuItems = document.querySelectorAll('.main-nav a');
   
+  // Получаем основной раздел из хеша (первая часть до /)
+  const mainSection = hash.split('/')[0];
+  
   // Маппинг хешей на заголовки страниц
   const hashToTitle = {
     'home': 'Главная',
@@ -142,10 +156,10 @@ function updateActiveMenuItem(hash) {
     item.classList.remove('active');
   });
   
-  // Если есть заголовок для хеша, находим соответствующий пункт меню и добавляем класс active
-  if (hashToTitle[hash]) {
+  // Если есть заголовок для основного раздела, находим соответствующий пункт меню и добавляем класс active
+  if (hashToTitle[mainSection]) {
     menuItems.forEach(item => {
-      if (item.textContent === hashToTitle[hash]) {
+      if (item.textContent === hashToTitle[mainSection]) {
         item.classList.add('active');
       }
     });
