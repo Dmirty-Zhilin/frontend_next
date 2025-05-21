@@ -53,15 +53,32 @@ app.use(session({
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
-// Статические файлы с абсолютным путем и правильными MIME-типами
+// Статические файлы с абсолютными путями и правильными MIME-типами
 app.use(express.static(path.join(__dirname, 'public'), {
-  setHeaders: (res, path) => {
+  setHeaders: function (res, path, stat) {
     if (path.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
+      res.set('Content-Type', 'application/javascript');
     } else if (path.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
+      res.set('Content-Type', 'text/css');
+    } else if (path.endsWith('.png')) {
+      res.set('Content-Type', 'image/png');
+    } else if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
+      res.set('Content-Type', 'image/jpeg');
+    } else if (path.endsWith('.svg')) {
+      res.set('Content-Type', 'image/svg+xml');
+    } else if (path.endsWith('.woff')) {
+      res.set('Content-Type', 'font/woff');
+    } else if (path.endsWith('.woff2')) {
+      res.set('Content-Type', 'font/woff2');
+    } else if (path.endsWith('.ttf')) {
+      res.set('Content-Type', 'font/ttf');
+    } else if (path.endsWith('.eot')) {
+      res.set('Content-Type', 'application/vnd.ms-fontobject');
     }
-  }
+  },
+  maxAge: '1d', // Кэширование на 1 день
+  etag: true,
+  lastModified: true
 }));
 
 // Middleware для передачи переменных во все шаблоны
