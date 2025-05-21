@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= typeof theme !== 'undefined' ? theme : 'light' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'DropAnalyzer' %></title>
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/themes/<%= typeof theme !== 'undefined' ? theme : 'light' %>.css">
+    
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Основной JavaScript -->
+    <script src="/js/main.js" defer></script>
+    <script src="/js/theme-switcher.js" defer></script>
+</head>
+<body data-theme="<%= typeof theme !== 'undefined' ? theme : 'light' %>" class="theme-dependent">
+    <header class="main-header theme-dependent">
+        <div class="container">
+            <a href="/" class="logo">DropAnalyzer</a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Главная</a></li>
+                    <li><a href="/dashboard" class="<%= currentPath === '/dashboard' ? 'active' : '' %>">Дашборд</a></li>
+                    <li><a href="/analysis" class="<%= currentPath === '/analysis' ? 'active' : '' %>">Анализ</a></li>
+                    <li><a href="/reports" class="<%= currentPath === '/reports' ? 'active' : '' %>">Отчеты</a></li>
+                    <li><a href="/ai-agents" class="<%= currentPath === '/ai-agents' ? 'active' : '' %>">AI-агенты</a></li>
+                </ul>
+            </nav>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
+                <span class="theme-toggle-icon"><%= typeof theme !== 'undefined' && theme === 'dark' ? '☀️' : '🌙' %></span>
+            </button>
+        </div>
+    </header>
+    
+    <main class="main-content theme-dependent">
+        <div class="container">
+            <%- body %>
+        </div>
+    </main>
+    
+    <footer class="footer theme-dependent">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-copyright">
+                    &copy; <%= new Date().getFullYear() %> DropAnalyzer. Все права защищены.
+                </div>
+                <div class="footer-links">
+                    <a href="/about">О проекте</a>
+                    <a href="/privacy">Конфиденциальность</a>
+                    <a href="/terms">Условия использования</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Предупреждение о соединении с бэкендом -->
+    <div id="backend-connection-warning" class="alert alert-warning fixed-bottom m-3" style="display: none;">
+        <strong>Предупреждение:</strong> Не удалось установить соединение с бэкендом. 
+        Некоторые функции могут быть недоступны. 
+        <button type="button" class="btn-close" aria-label="Close"></button>
+    </div>
+</body>
+</html>
