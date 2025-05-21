@@ -6,9 +6,15 @@ function initThemeToggle() {
   document.documentElement.setAttribute('data-theme', currentTheme);
   document.body.setAttribute('data-theme', currentTheme);
   
-  // Обработчик переключения темы
+  // Обновляем иконку переключателя при загрузке
   const themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
+    const themeIcon = themeToggle.querySelector('.theme-toggle-icon');
+    if (themeIcon) {
+      themeIcon.textContent = currentTheme === 'light' ? '🌙' : '☀️';
+    }
+    
+    // Обработчик переключения темы
     themeToggle.addEventListener('click', function() {
       const currentTheme = document.documentElement.getAttribute('data-theme');
       const newTheme = currentTheme === 'light' ? 'dark' : 'light';
@@ -18,7 +24,6 @@ function initThemeToggle() {
       localStorage.setItem('theme', newTheme);
       
       // Обновление иконки переключателя
-      const themeIcon = themeToggle.querySelector('.theme-toggle-icon');
       if (themeIcon) {
         themeIcon.textContent = newTheme === 'light' ? '🌙' : '☀️';
       }
@@ -323,3 +328,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
+
+// Немедленная инициализация темы (до DOMContentLoaded)
+(function() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  if (document.body) document.body.setAttribute('data-theme', savedTheme);
+})();
