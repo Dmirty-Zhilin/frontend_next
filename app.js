@@ -9,7 +9,6 @@ const compression = require('compression');
 const cors = require('cors');
 const morgan = require('morgan');
 const methodOverride = require('method-override');
-
 // Импорт маршрутов
 const indexRoutes = require('./routes/index');
 const dashboardRoutes = require('./routes/dashboard');
@@ -17,16 +16,12 @@ const analysisRoutes = require('./routes/analysis');
 const reportsRoutes = require('./routes/reports');
 const aiAgentsRoutes = require('./routes/ai-agents');
 const domainsRoutes = require('./routes/api/domains');
-
 const app = express();
-
 // Настройка порта
 const PORT = process.env.PORT || 3060;
-
 // Настройка шаблонизатора EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
 // Middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -54,10 +49,7 @@ app.use(session({
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
-// Статические файлы с абсолютным путем
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Middleware для правильных MIME-типов
+// Middleware для правильных MIME-типов - ПЕРЕМЕЩЕНО ВЫШЕ express.static
 app.use((req, res, next) => {
   const url = req.url;
   if (url.endsWith('.js')) {
@@ -68,12 +60,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// Статические файлы с абсолютным путем
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Middleware для передачи переменных во все шаблоны
 app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   res.locals.theme = req.cookies.theme || 'light';
   next();
 });
+
+// Тестовый маршрут для проверки стилей - ПЕРЕМЕЩЕНО ВЫШЕ других маршрутов
+app.use('/test-styles', require('./routes/test-styles'));
 
 // Маршруты
 app.use('/', indexRoutes);
@@ -113,6 +111,3 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 module.exports = app;
-
-// Тестовый маршрут для проверки стилей
-app.use('/test-styles', require('./routes/test-styles'));
