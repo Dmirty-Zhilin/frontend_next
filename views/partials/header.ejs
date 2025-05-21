@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= theme %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | DropAnalyzer</title>
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/themes/<%= theme %>.css">
+    
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js через CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Основной JavaScript -->
+    <script src="/js/main.js" defer></script>
+    <script src="/js/components/charts.js" defer></script>
+    <script src="/js/components/analysis.js" defer></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <a href="/" class="logo">DropAnalyzer</a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/" class="<%= title === 'Главная' ? 'active' : '' %>">Главная</a></li>
+                    <li><a href="/dashboard" class="<%= title === 'Дашборд' ? 'active' : '' %>">Дашборд</a></li>
+                    <li><a href="/analysis" class="<%= title === 'Анализ доменов' ? 'active' : '' %>">Анализ</a></li>
+                    <li><a href="/reports" class="<%= title === 'Отчеты' ? 'active' : '' %>">Отчеты</a></li>
+                    <li><a href="/ai-agents" class="<%= title === 'AI-агенты' ? 'active' : '' %>">AI-агенты</a></li>
+                </ul>
+            </nav>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
+                <span class="theme-toggle-icon">🌙</span>
+            </button>
+        </div>
+    </header>
+    <main class="main-content">

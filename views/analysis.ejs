@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Анализатор дропов</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/themes/<%= theme %>.css">
+    <!-- React и Material UI будут загружены через CDN для упрощения -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="theme-<%= theme %>">
+    <%- include('partials/header') %>
+    
+    <main class="container">
+        <h1 class="mt-4 mb-4">Анализ доменов</h1>
+        
+        <div class="analysis-form">
+            <form action="/analysis/start" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="domains" class="form-label">Файл со списком доменов</label>
+                    <input type="file" name="domains" id="domains" class="form-control" required>
+                    <small class="text-muted">Загрузите файл в формате TXT или CSV с доменами (по одному на строку)</small>
+                </div>
+                
+                <h3>Расширенные настройки</h3>
+                <div class="analysis-options">
+                    <div class="form-group">
+                        <label for="matchType" class="form-label">Тип соответствия</label>
+                        <select name="matchType" id="matchType" class="form-select">
+                            <% analysisOptions.matchTypes.forEach(function(type) { %>
+                                <option value="<%= type %>"><%= type %></option>
+                            <% }); %>
+                        </select>
+                        <small class="text-muted">Тип соответствия для CDX API</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="collapse" class="form-label">Collapse</label>
+                        <select name="collapse" id="collapse" class="form-select">
+                            <% analysisOptions.collapseOptions.forEach(function(option) { %>
+                                <option value="<%= option %>"><%= option %></option>
+                            <% }); %>
+                        </select>
+                        <small class="text-muted">Параметр collapse для CDX API</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="limit" class="form-label">Лимит</label>
+                        <select name="limit" id="limit" class="form-select">
+                            <% analysisOptions.limitOptions.forEach(function(limit) { %>
+                                <option value="<%= limit %>" <%= limit === 1000 ? 'selected' : '' %>><%= limit %></option>
+                            <% }); %>
+                        </select>
+                        <small class="text-muted">Размер пакета для CDX API</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="concurrency" class="form-label">Одновременные запросы</label>
+                        <select name="concurrency" id="concurrency" class="form-select">
+                            <% analysisOptions.concurrencyOptions.forEach(function(concurrency) { %>
+                                <option value="<%= concurrency %>" <%= concurrency === 10 ? 'selected' : '' %>><%= concurrency %></option>
+                            <% }); %>
+                        </select>
+                        <small class="text-muted">Количество одновременных запросов</small>
+                    </div>
+                </div>
+                
+                <div class="form-group mt-4">
+                    <div class="form-check">
+                        <input type="checkbox" name="clickhouse" id="clickhouse" class="form-check-input">
+                        <label for="clickhouse" class="form-check-label">Экспорт в ClickHouse</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" name="verbose" id="verbose" class="form-check-input">
+                        <label for="verbose" class="form-check-label">Подробное логирование</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" name="use_ai" id="use_ai" class="form-check-input" checked>
+                        <label for="use_ai" class="form-check-label">Использовать AI-рекомендации</label>
+                    </div>
+                </div>
+                
+                <div id="ai-agent-settings" class="card mt-3 mb-3">
+                    <div class="card-header">
+                        <h4 class="mb-0">Настройки AI-агента</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="minSnapshots" class="form-label">Минимальное количество снимков</label>
+                                    <input type="number" name="minSnapshots" id="minSnapshots" class="form-control" value="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="minYearsCovered" class="form-label">Минимальное количество лет</label>
+                                    <input type="number" name="minYearsCovered" id="minYearsCovered" class="form-control" value="3">
+                                </div>
+                                <div class="form-group">
+                                    <label for="maxAvgIntervalDays" class="form-label">Максимальный средний интервал (дни)</label>
+                                    <input type="number" name="maxAvgIntervalDays" id="maxAvgIntervalDays" class="form-control" value="90">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="maxGapDays" class="form-label">Максимальный промежуток (дни)</label>
+                                    <input type="number" name="maxGapDays" id="maxGapDays" class="form-control" value="180">
+                                </div>
+                                <div class="form-group">
+                                    <label for="minTimemapCount" class="form-label">Минимальное количество timemap</label>
+                                    <input type="number" name="minTimemapCount" id="minTimemapCount" class="form-control" value="100">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ai_model" class="form-label">Модель AI</label>
+                                    <select name="ai_model" id="ai_model" class="form-select">
+                                        <option value="standard" selected>Стандартная</option>
+                                        <option value="advanced">Расширенная</option>
+                                        <option value="experimental">Экспериментальная</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">Запустить анализ</button>
+                    <a href="/dashboard" class="btn btn-outline">Отмена</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="mb-0">Предыдущие анализы</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID задачи</th>
+                                <th>Дата</th>
+                                <th>Доменов</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>task-1621508400000</td>
+                                <td>20.05.2025 14:00</td>
+                                <td>1000</td>
+                                <td><span class="badge badge-success">Завершен</span></td>
+                                <td><a href="/reports/report-001" class="btn btn-sm btn-outline">Отчет</a></td>
+                            </tr>
+                            <tr>
+                                <td>task-1621422000000</td>
+                                <td>19.05.2025 10:00</td>
+                                <td>500</td>
+                                <td><span class="badge badge-success">Завершен</span></td>
+                                <td><a href="/reports/report-002" class="btn btn-sm btn-outline">Отчет</a></td>
+                            </tr>
+                            <tr>
+                                <td>task-1621335600000</td>
+                                <td>18.05.2025 09:00</td>
+                                <td>100</td>
+                                <td><span class="badge badge-success">Завершен</span></td>
+                                <td><a href="/reports/report-003" class="btn btn-sm btn-outline">Отчет</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('partials/footer') %>
+    
+    <script>
+        // Переключение видимости настроек AI-агента
+        document.addEventListener('DOMContentLoaded', function() {
+            const useAiCheckbox = document.getElementById('use_ai');
+            const aiAgentSettings = document.getElementById('ai-agent-settings');
+            
+            function toggleAiSettings() {
+                aiAgentSettings.style.display = useAiCheckbox.checked ? 'block' : 'none';
+            }
+            
+            useAiCheckbox.addEventListener('change', toggleAiSettings);
+            toggleAiSettings(); // Инициализация при загрузке
+        });
+    </script>
+</body>
+</html>

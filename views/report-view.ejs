@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Анализатор дропов</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/themes/<%= theme %>.css">
+    <!-- React и Material UI будут загружены через CDN для упрощения -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body class="theme-<%= theme %>">
+    <%- include('partials/header') %>
+    
+    <main class="container">
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+            <h1 class="mb-0">Отчет: <%= report.name %></h1>
+            <div class="btn-group">
+                <a href="/reports/<%= report.id %>/export/excel" class="btn btn-outline">Экспорт Excel</a>
+                <a href="/reports/<%= report.id %>/export/csv" class="btn btn-outline">Экспорт CSV</a>
+                <a href="/reports/<%= report.id %>/export/json" class="btn btn-outline">Экспорт JSON</a>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">Общая информация</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Дата создания:</strong> <%= new Date(report.date).toLocaleString() %></p>
+                        <p><strong>Всего доменов:</strong> <%= report.totalDomains %></p>
+                        <p><strong>Рекомендовано:</strong> <%= report.recommendedDomains %></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Статус:</strong> 
+                            <% if (report.status === 'completed') { %>
+                                <span class="badge badge-success">Завершен</span>
+                            <% } else if (report.status === 'processing') { %>
+                                <span class="badge badge-warning">В процессе</span>
+                            <% } else if (report.status === 'failed') { %>
+                                <span class="badge badge-danger">Ошибка</span>
+                            <% } %>
+                        </p>
+                        <p><strong>Время выполнения:</strong> <%= report.executionTime %> сек.</p>
+                        <p><strong>Использован AI:</strong> <%= report.usedAI ? 'Да' : 'Нет' %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h3>Распределение по годам</h3>
+                    <canvas id="yearDistributionChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h3>Распределение по рейтингу</h3>
+                    <canvas id="ratingDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container mt-4">
+            <h3>Количество снимков по доменам</h3>
+            <canvas id="snapshotsChart"></canvas>
+        </div>
+        
+        <div class="report-filters mt-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="domain-search" class="form-label">Поиск домена</label>
+                        <input type="text" id="domain-search" class="form-control" placeholder="Введите домен...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="rating-filter" class="form-label">Рейтинг</label>
+                        <select id="rating-filter" class="form-select">
+                            <option value="all">Все</option>
+                            <option value="high">Высокий</option>
+                            <option value="medium">Средний</option>
+                            <option value="low">Низкий</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="sort-by" class="form-label">Сортировка</label>
+                        <select id="sort-by" class="form-select">
+                            <option value="domain">По домену</option>
+                            <option value="snapshots">По снимкам</option>
+                            <option value="rating">По рейтингу</option>
+                            <option value="years">По годам</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="form-label">&nbsp;</label>
+                        <button id="apply-domain-filters" class="btn btn-primary w-100">Применить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="report-table-container mt-4">
+            <table class="table" id="domains-table">
+                <thead>
+                    <tr>
+                        <th>Домен</th>
+                        <th>Снимков</th>
+                        <th>Годы</th>
+                        <th>Средний интервал</th>
+                        <th>Макс. промежуток</th>
+                        <th>Рейтинг</th>
+                        <th>Рекомендация</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% report.domains.forEach(function(domain) { %>
+                        <tr>
+                            <td><a href="https://<%= domain.name %>" target="_blank"><%= domain.name %></a></td>
+                            <td><%= domain.snapshots %></td>
+                            <td><%= domain.yearsCovered %></td>
+                            <td><%= domain.avgInterval %> дней</td>
+                            <td><%= domain.maxGap %> дней</td>
+                            <td>
+                                <% if (domain.rating >= 8) { %>
+                                    <span class="badge badge-success">Высокий (<%= domain.rating %>)</span>
+                                <% } else if (domain.rating >= 5) { %>
+                                    <span class="badge badge-warning">Средний (<%= domain.rating %>)</span>
+                                <% } else { %>
+                                    <span class="badge badge-danger">Низкий (<%= domain.rating %>)</span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (domain.recommended) { %>
+                                    <span class="badge badge-success">Рекомендован</span>
+                                <% } else { %>
+                                    <span class="badge badge-info">Не рекомендован</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination-container text-center mt-4">
+            <nav aria-label="Навигация по страницам">
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Предыдущая</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Следующая</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </main>
+    
+    <%- include('partials/footer') %>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Получение данных для графиков
+            fetch('/reports/<%= report.id %>/chart-data')
+                .then(response => response.json())
+                .then(data => {
+                    // График распределения по годам
+                    const yearDistributionCtx = document.getElementById('yearDistributionChart').getContext('2d');
+                    new Chart(yearDistributionCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.yearDistribution.labels,
+                            datasets: [{
+                                label: 'Количество доменов',
+                                data: data.yearDistribution.values,
+                                backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                                borderColor: 'rgba(79, 70, 229, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                    
+                    // График распределения по рейтингу
+                    const ratingDistributionCtx = document.getElementById('ratingDistributionChart').getContext('2d');
+                    new Chart(ratingDistributionCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Высокий', 'Средний', 'Низкий'],
+                            datasets: [{
+                                data: data.ratingDistribution,
+                                backgroundColor: [
+                                    'rgba(16, 185, 129, 0.7)',
+                                    'rgba(245, 158, 11, 0.7)',
+                                    'rgba(239, 68, 68, 0.7)'
+                                ],
+                                borderColor: [
+                                    'rgba(16, 185, 129, 1)',
+                                    'rgba(245, 158, 11, 1)',
+                                    'rgba(239, 68, 68, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                    
+                    // График количества снимков по доменам (топ-20)
+                    const snapshotsCtx = document.getElementById('snapshotsChart').getContext('2d');
+                    new Chart(snapshotsCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.topDomains.domains,
+                            datasets: [{
+                                label: 'Количество снимков',
+                                data: data.topDomains.snapshots,
+                                backgroundColor: 'rgba(14, 165, 233, 0.7)',
+                                borderColor: 'rgba(14, 165, 233, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Ошибка при загрузке данных для графиков:', error));
+            
+            // Функция для фильтрации доменов
+            function filterDomains() {
+                const searchTerm = document.getElementById('domain-search').value.toLowerCase();
+                const ratingFilter = document.getElementById('rating-filter').value;
+                const sortBy = document.getElementById('sort-by').value;
+                
+                const table = document.getElementById('domains-table');
+                const rows = Array.from(table.querySelectorAll('tbody tr'));
+                
+                // Фильтрация
+                rows.forEach(row => {
+                    const domain = row.cells[0].textContent.toLowerCase();
+                    const rating = row.cells[5].textContent.toLowerCase();
+                    
+                    let showRow = true;
+                    
+                    // Фильтр по поиску
+                    if (searchTerm && !domain.includes(searchTerm)) {
+                        showRow = false;
+                    }
+                    
+                    // Фильтр по рейтингу
+                    if (ratingFilter !== 'all') {
+                        if (ratingFilter === 'high' && !rating.includes('высокий')) {
+                            showRow = false;
+                        } else if (ratingFilter === 'medium' && !rating.includes('средний')) {
+                            showRow = false;
+                        } else if (ratingFilter === 'low' && !rating.includes('низкий')) {
+                            showRow = false;
+                        }
+                    }
+                    
+                    row.style.display = showRow ? '' : 'none';
+                });
+                
+                // Сортировка
+                const sortedRows = rows.filter(row => row.style.display !== 'none').sort((a, b) => {
+                    if (sortBy === 'domain') {
+                        return a.cells[0].textContent.localeCompare(b.cells[0].textContent);
+                    } else if (sortBy === 'snapshots') {
+                        return parseInt(b.cells[1].textContent) - parseInt(a.cells[1].textContent);
+                    } else if (sortBy === 'rating') {
+                        const ratingA = parseFloat(a.cells[5].textContent.match(/\((\d+(\.\d+)?)\)/)[1]);
+                        const ratingB = parseFloat(b.cells[5].textContent.match(/\((\d+(\.\d+)?)\)/)[1]);
+                        return ratingB - ratingA;
+                    } else if (sortBy === 'years') {
+                        return parseInt(b.cells[2].textContent) - parseInt(a.cells[2].textContent);
+                    }
+                    return 0;
+                });
+                
+                // Обновление таблицы
+                const tbody = table.querySelector('tbody');
+                tbody.innerHTML = '';
+                sortedRows.forEach(row => tbody.appendChild(row));
+            }
+            
+            // Обработчик кнопки применения фильтров
+            document.getElementById('apply-domain-filters').addEventListener('click', filterDomains);
+            
+            // Обработчик поля поиска (фильтрация при вводе)
+            document.getElementById('domain-search').addEventListener('input', function() {
+                if (this.value.length >= 3 || this.value.length === 0) {
+                    filterDomains();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

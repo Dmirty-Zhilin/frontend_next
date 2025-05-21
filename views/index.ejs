@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Анализатор дропов</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/themes/<%= theme %>.css">
+    <!-- React и Material UI будут загружены через CDN для упрощения -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="theme-<%= theme %>">
+    <%- include('partials/header') %>
+    
+    <main class="container">
+        <div class="hero-section">
+            <h1>Анализатор дроп-доменов</h1>
+            <p>Современный инструмент для анализа и оценки доменов через Wayback Machine</p>
+            <div class="cta-buttons">
+                <a href="/analysis" class="btn btn-primary">Начать анализ</a>
+                <a href="/dashboard" class="btn btn-secondary">Панель управления</a>
+            </div>
+        </div>
+        
+        <section class="features">
+            <h2>Возможности платформы</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Глубокий анализ</h3>
+                    <p>Анализ исторических данных доменов через Wayback Machine с учетом множества параметров</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Интерактивные отчеты</h3>
+                    <p>Детальные отчеты с интерактивными графиками и визуализациями</p>
+                </div>
+                <div class="feature-card">
+                    <h3>AI-рекомендации</h3>
+                    <p>Интеллектуальные рекомендации по доменам на основе машинного обучения</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Гибкие настройки</h3>
+                    <p>Расширенные настройки параметров анализа для точной оценки</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="process-steps">
+            <h2>Как это работает</h2>
+            <ol class="process-steps">
+                <li>
+                    <h3>Загрузите список доменов</h3>
+                    <p>Загрузите файл со списком доменов для анализа в формате TXT или CSV</p>
+                </li>
+                <li>
+                    <h3>Настройте параметры</h3>
+                    <p>Выберите параметры анализа или используйте рекомендуемые настройки</p>
+                </li>
+                <li>
+                    <h3>Запустите анализ</h3>
+                    <p>Система проанализирует домены через Wayback Machine и соберет исторические данные</p>
+                </li>
+                <li>
+                    <h3>Получите результаты</h3>
+                    <p>Изучите интерактивные отчеты и рекомендации по каждому домену</p>
+                </li>
+            </ol>
+        </section>
+        
+        <!-- Контейнер для React-компонента статистики -->
+        <section class="stats-section">
+            <h2>Текущая статистика</h2>
+            <div id="stats-component"></div>
+        </section>
+    </main>
+    
+    <%- include('partials/footer') %>
+    
+    <script src="/js/main.js"></script>
+    <script src="/js/dist/bundle.js"></script>
+</body>
+</html>
