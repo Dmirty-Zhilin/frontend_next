@@ -22,6 +22,47 @@ const PORT = process.env.PORT || 3060;
 // Настройка шаблонизатора EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Статические файлы с абсолютными путями и правильными MIME-типами
+// Перемещено выше других middleware для приоритетной обработки
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: function (res, path, stat) {
+    if (path.endsWith('.js')) {
+      res.set('Content-Type', 'application/javascript');
+    } else if (path.endsWith('.css')) {
+      res.set('Content-Type', 'text/css');
+    } else if (path.endsWith('.png')) {
+      res.set('Content-Type', 'image/png');
+    } else if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
+      res.set('Content-Type', 'image/jpeg');
+    } else if (path.endsWith('.svg')) {
+      res.set('Content-Type', 'image/svg+xml');
+    } else if (path.endsWith('.woff')) {
+      res.set('Content-Type', 'font/woff');
+    } else if (path.endsWith('.woff2')) {
+      res.set('Content-Type', 'font/woff2');
+    } else if (path.endsWith('.ttf')) {
+      res.set('Content-Type', 'font/ttf');
+    } else if (path.endsWith('.eot')) {
+      res.set('Content-Type', 'application/vnd.ms-fontobject');
+    }
+  },
+  maxAge: '1d', // Кэширование на 1 день
+  etag: true,
+  lastModified: true
+}));
+
+// Добавляем явный middleware для обработки JS и CSS файлов
+app.get('*.js', function(req, res, next) {
+  res.set('Content-Type', 'application/javascript');
+  next();
+});
+
+app.get('*.css', function(req, res, next) {
+  res.set('Content-Type', 'text/css');
+  next();
+});
+
 // Middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -53,44 +94,14 @@ app.use(session({
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
-// Статические файлы с абсолютными путями и правильными MIME-типами
-app.use(express.static(path.join(__dirname, 'public'), {
-  setHeaders: function (res, path, stat) {
-    if (path.endsWith('.js')) {
-      res.set('Content-Type', 'application/javascript');
-    } else if (path.endsWith('.css')) {
-      res.set('Content-Type', 'text/css');
-    } else if (path.endsWith('.png')) {
-      res.set('Content-Type', 'image/png');
-    } else if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
-      res.set('Content-Type', 'image/jpeg');
-    } else if (path.endsWith('.svg')) {
-      res.set('Content-Type', 'image/svg+xml');
-    } else if (path.endsWith('.woff')) {
-      res.set('Content-Type', 'font/woff');
-    } else if (path.endsWith('.woff2')) {
-      res.set('Content-Type', 'font/woff2');
-    } else if (path.endsWith('.ttf')) {
-      res.set('Content-Type', 'font/ttf');
-    } else if (path.endsWith('.eot')) {
-      res.set('Content-Type', 'application/vnd.ms-fontobject');
-    }
-  },
-  maxAge: '1d', // Кэширование на 1 день
-  etag: true,
-  lastModified: true
-}));
-
 // Middleware для передачи переменных во все шаблоны
 app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   res.locals.theme = req.cookies.theme || 'light';
   next();
 });
-
 // Тестовый маршрут для проверки стилей - ПЕРЕМЕЩЕНО ВЫШЕ других маршрутов
 app.use('/test-styles', require('./routes/test-styles'));
-
 // Маршруты
 app.use('/', indexRoutes);
 app.use('/dashboard', dashboardRoutes);
@@ -98,12 +109,10 @@ app.use('/analysis', analysisRoutes);
 app.use('/reports', reportsRoutes);
 app.use('/ai-agents', aiAgentsRoutes);
 app.use('/api/domains', domainsRoutes);
-
 // API маршруты
 app.use('/api/analysis', require('./routes/api/analysis'));
 app.use('/api/reports', require('./routes/api/reports'));
 app.use('/api/ai-agents', require('./routes/api/ai-agents'));
-
 // Обработка ошибок 404
 app.use((req, res, next) => {
   res.status(404).render('error', {
@@ -112,7 +121,6 @@ app.use((req, res, next) => {
     error: { status: 404 }
   });
 });
-
 // Обработка ошибок сервера
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -122,10 +130,8 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'production' ? {} : err
   });
 });
-
 // Запуск сервера
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Сервер запущен на порту ${PORT}`);
 });
-
 module.exports = app;
