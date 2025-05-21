@@ -3,15 +3,28 @@
 // Функция для инициализации темной/светлой темы
 function initThemeToggle() {
   const currentTheme = localStorage.getItem('theme') || 'light';
-  document.body.classList.add(`theme-${currentTheme}`);
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  document.body.setAttribute('data-theme', currentTheme);
   
   // Обработчик переключения темы
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('.theme-toggle button')) {
-      const newTheme = document.body.classList.contains('theme-light') ? 'dark' : 'light';
-      document.body.classList.remove('theme-light', 'theme-dark');
-      document.body.classList.add(`theme-${newTheme}`);
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      document.body.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
+      
+      // Обновление иконки переключателя
+      const themeIcon = themeToggle.querySelector('.theme-toggle-icon');
+      if (themeIcon) {
+        themeIcon.textContent = newTheme === 'light' ? '🌙' : '☀️';
+      }
+      
+      // Отправка события изменения темы
+      document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
       
       // Отправка запроса на сервер для сохранения темы в сессии
       fetch('/theme/toggle', {
@@ -21,8 +34,8 @@ function initThemeToggle() {
         },
         body: JSON.stringify({ theme: newTheme })
       }).catch(err => console.error('Ошибка при сохранении темы:', err));
-    }
-  });
+    });
+  }
 }
 
 // Функция для инициализации интерактивных графиков
@@ -30,11 +43,11 @@ function initCharts() {
   // Настройка глобальных параметров Chart.js
   if (window.Chart) {
     Chart.defaults.font.family = "'Inter', sans-serif";
-    Chart.defaults.color = document.body.classList.contains('theme-dark') ? '#e5e7eb' : '#374151';
+    Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#e5e7eb' : '#374151';
     
     // Адаптация цветов графиков для темной темы
     document.addEventListener('themeChanged', function() {
-      Chart.defaults.color = document.body.classList.contains('theme-dark') ? '#e5e7eb' : '#374151';
+      Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#e5e7eb' : '#374151';
       // Обновление всех графиков на странице
       Chart.instances.forEach(chart => chart.update());
     });
@@ -140,7 +153,8 @@ function initTooltips() {
 
 // Функция для инициализации проверки соединения с бэкендом
 function checkBackendConnection() {
-  const apiUrl = window.API_URL || 'http://backend:8005';
+  // Используем относительный URL или берем из переменной окружения
+  const apiUrl = window.API_URL || '/api/v1';
   
   fetch(`${apiUrl}/health`, { 
     method: 'GET',
@@ -165,7 +179,7 @@ function checkBackendConnection() {
       // Создать предупреждение, если его нет
       const warning = document.createElement('div');
       warning.id = 'backend-connection-warning';
-      warning.className = 'alert alert-warning fixed-top m-3';
+      warning.className = 'alert alert-warning fixed-bottom m-3';
       warning.innerHTML = `
         <strong>Предупреждение:</strong> Не удалось установить соединение с бэкендом. 
         Некоторые функции могут быть недоступны. 
@@ -181,18 +195,121 @@ function checkBackendConnection() {
   });
 }
 
+// Функция для инициализации хеш-навигации
+function initHashNavigation() {
+  // Обработка начального хеша при загрузке страницы
+  if (window.location.hash) {
+    const hash = window.location.hash.substring(1); // Убираем символ #
+    loadContent(hash);
+  }
+
+  // Обработка изменения хеша
+  window.addEventListener('hashchange', function() {
+    const hash = window.location.hash.substring(1);
+    loadContent(hash);
+  });
+
+  // Обработка клика по ссылкам навигации
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (link && link.getAttribute('href') && link.getAttribute('href').startsWith('#')) {
+      e.preventDefault();
+      const hash = link.getAttribute('href').substring(1);
+      window.location.hash = hash;
+      
+      // Активация пункта меню
+      document.querySelectorAll('.main-nav a').forEach(navLink => {
+        navLink.classList.remove('active');
+      });
+      
+      // Находим соответствующий пункт меню и активируем его
+      const menuItem = document.querySelector(`.main-nav a[href="#${hash.split('/')[0]}"]`);
+      if (menuItem) {
+        menuItem.classList.add('active');
+      }
+    }
+  });
+}
+
+// Функция для загрузки контента по хешу
+function loadContent(hash) {
+  if (!hash) return;
+  
+  // Разбиваем хеш на части (например, "reports/report-001" -> ["reports", "report-001"])
+  const parts = hash.split('/');
+  const section = parts[0]; // Основной раздел (например, "reports")
+  const subSection = parts.length > 1 ? parts.slice(1).join('/') : null; // Подраздел (например, "report-001")
+  
+  // Активация пункта меню
+  document.querySelectorAll('.main-nav a').forEach(link => {
+    link.classList.remove('active');
+  });
+  
+  const menuItem = document.querySelector(`.main-nav a[href="#${section}"]`);
+  if (menuItem) {
+    menuItem.classList.add('active');
+  }
+  
+  // Загрузка контента
+  const contentContainer = document.querySelector('.main-content .container');
+  if (!contentContainer) return;
+  
+  // Формируем URL для загрузки контента
+  let contentUrl;
+  if (subSection) {
+    // Для вложенных страниц используем путь вида "/reports/report-001"
+    contentUrl = `/${section}/${subSection}`;
+  } else {
+    // Для основных разделов используем путь вида "/dashboard"
+    contentUrl = `/${section}`;
+  }
+  
+  // Загружаем контент через AJAX
+  fetch(contentUrl)
+    .then(response => {
+      if (!response.ok) throw new Error(`Статус: ${response.status}`);
+      return response.text();
+    })
+    .then(html => {
+      contentContainer.innerHTML = html;
+      // Инициализация скриптов для нового контента
+      initCharts();
+      initTableFilters();
+      initDropdowns();
+      initAdvancedSettings();
+      initTooltips();
+    })
+    .catch(error => {
+      console.error('Ошибка загрузки контента:', error);
+      contentContainer.innerHTML = `
+        <div class="error-container">
+          <h1>Ошибка загрузки</h1>
+          <p>Не удалось загрузить запрашиваемый контент. Пожалуйста, попробуйте позже.</p>
+          <p class="text-muted">Детали ошибки: ${error.message}</p>
+        </div>
+      `;
+    });
+}
+
 // Инициализация всех компонентов при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
+  // Инициализация темы
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.body.setAttribute('data-theme', savedTheme);
+  
+  // Инициализация компонентов
   initThemeToggle();
   initCharts();
   initTableFilters();
   initDropdowns();
   initAdvancedSettings();
   initTooltips();
+  initHashNavigation();
   checkBackendConnection();
   
   // Дополнительная инициализация для конкретных страниц
-  if (window.location.pathname.includes('/analysis')) {
+  if (window.location.pathname.includes('/analysis') || window.location.hash.startsWith('#analysis')) {
     // Специфичная логика для страницы анализа
     const useAiCheckbox = document.getElementById('use_ai');
     const aiAgentSettings = document.getElementById('ai-agent-settings');
