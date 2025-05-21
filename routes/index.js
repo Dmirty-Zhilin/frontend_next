@@ -3,17 +3,15 @@ const router = express.Router();
 
 // Главная страница
 router.get('/', (req, res) => {
-  res.render('index', { title: 'Анализатор дропов' });
+  res.render('index', { 
+    title: 'Анализатор дропов',
+    description: 'Современный инструмент для анализа дроп-доменов через Wayback Machine'
+  });
 });
 
 // Статическая версия (SPA)
 router.get('/static', (req, res) => {
   res.render('static', { title: 'Анализатор дропов - Статическая версия' });
-});
-
-module.exports = router;Главная',
-    description: 'Современный инструмент для анализа дроп-доменов через Wayback Machine'
-  });
 });
 
 // Страница о проекте
