@@ -1,14 +1,14 @@
 <!-- Подвал сайта -->
-<footer class="bg-light p-4 mt-5">
+<footer class="footer">
     <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <h4><span class="text-primary">Drop</span>Analyzer</h4>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h4><span class="accent-color">Drop</span>Analyzer</h4>
                 <p>Современный инструмент для анализа дроп-доменов через Wayback Machine</p>
             </div>
-            <div class="col-md-3">
+            <div class="footer-nav">
                 <h5>Навигация</h5>
-                <ul class="list-unstyled">
+                <ul>
                     <li><a href="/">Главная</a></li>
                     <li><a href="/dashboard">Дашборд</a></li>
                     <li><a href="/analysis">Анализ</a></li>
@@ -16,17 +16,128 @@
                     <li><a href="/ai-agents">AI-агенты</a></li>
                 </ul>
             </div>
-            <div class="col-md-3">
+            <div class="footer-info">
                 <h5>Информация</h5>
-                <ul class="list-unstyled">
+                <ul>
                     <li><a href="/about">О проекте</a></li>
                     <li><a href="https://github.com/wayback-machine/wayback" target="_blank">Wayback Machine API</a></li>
                 </ul>
             </div>
         </div>
         <hr>
-        <div class="text-center">
+        <div class="footer-copyright">
             <p>&copy; 2025 DropAnalyzer. Все права защищены.</p>
         </div>
     </div>
 </footer>
+
+<style>
+    /* Стили для футера */
+    .footer {
+        background-color: var(--bg-secondary);
+        padding: 40px 0 20px;
+        margin-top: 40px;
+        color: var(--text-primary);
+    }
+    
+    .footer-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    
+    .footer-brand {
+        flex: 0 0 100%;
+        margin-bottom: 20px;
+    }
+    
+    .footer-brand h4 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .footer-brand .accent-color {
+        color: var(--accent-color);
+    }
+    
+    .footer-nav, .footer-info {
+        flex: 0 0 100%;
+        margin-bottom: 20px;
+    }
+    
+    .footer h5 {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    
+    .footer ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .footer ul li {
+        margin-bottom: 8px;
+    }
+    
+    .footer ul li a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .footer ul li a:hover {
+        color: var(--accent-color);
+    }
+    
+    .footer hr {
+        border: 0;
+        border-top: 1px solid var(--border-color);
+        margin: 20px 0;
+    }
+    
+    .footer-copyright {
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    /* Адаптивность для планшетов и десктопов */
+    @media (min-width: 768px) {
+        .footer-brand {
+            flex: 0 0 50%;
+        }
+        
+        .footer-nav, .footer-info {
+            flex: 0 0 25%;
+        }
+    }
+</style>
+
+<script>
+    // Базовый JavaScript для функциональности темы
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlRoot = document.documentElement;
+        const themeIcon = document.querySelector('.theme-toggle-icon');
+        
+        // Функция переключения темы
+        function toggleTheme() {
+            const currentTheme = htmlRoot.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            htmlRoot.setAttribute('data-theme', newTheme);
+            themeIcon.textContent = newTheme === 'light' ? '🌙' : '☀️';
+            
+            // Сохраняем выбор пользователя в куки
+            document.cookie = `theme=${newTheme}; path=/; max-age=31536000`;
+        }
+        
+        // Добавляем обработчик события для кнопки переключения темы
+        if (themeToggle) {
+            themeToggle.addEventListener('click', toggleTheme);
+        }
+    });
+</script>
