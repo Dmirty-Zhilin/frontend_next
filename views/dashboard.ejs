@@ -1,181 +1,163 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> | Анализатор дропов</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/themes/<%= theme %>.css">
-    <!-- React и Material UI будут загружены через CDN для упрощения -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="theme-<%= theme %>">
-    <%- include('partials/header') %>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Панель управления</h1>
+        <p>Обзор активности и статистика анализа доменов</p>
+    </div>
     
-    <main class="container">
-        <h1 class="mt-4 mb-4">Панель управления</h1>
-        
-        <div class="dashboard-cards">
-            <div class="dashboard-card">
-                <div class="value"><%= stats.totalDomains %></div>
-                <div class="label">Всего доменов</div>
-            </div>
-            <div class="dashboard-card">
-                <div class="value"><%= stats.analyzedDomains %></div>
-                <div class="label">Проанализировано</div>
-            </div>
-            <div class="dashboard-card">
-                <div class="value"><%= stats.recommendedDomains %></div>
-                <div class="label">Рекомендовано</div>
-            </div>
-            <div class="dashboard-card">
-                <div class="value"><%= stats.averageAnalysisTime %> с</div>
-                <div class="label">Среднее время анализа</div>
-            </div>
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-value">1,245</div>
+            <div class="stat-label">Проанализировано доменов</div>
         </div>
-        
-        <div class="row">
-            <div class="col-md-6">
-                <div class="chart-container">
-                    <h3>Домены по годам</h3>
-                    <canvas id="domainsByYearChart"></canvas>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="chart-container">
-                    <h3>Статистика рекомендаций</h3>
-                    <canvas id="recommendationsChart"></canvas>
-                </div>
-            </div>
+        <div class="stat-card">
+            <div class="stat-value">42</div>
+            <div class="stat-label">Отчетов создано</div>
         </div>
-        
-        <div class="chart-container">
-            <h3>Распределение времени анализа</h3>
-            <canvas id="analysisTimeChart"></canvas>
+        <div class="stat-card">
+            <div class="stat-value">502</div>
+            <div class="stat-label">Рекомендованных доменов</div>
         </div>
-        
-        <div class="card mt-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="mb-0">Последние анализы</h3>
-                <a href="/reports" class="btn btn-sm btn-primary">Все отчеты</a>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Название</th>
-                                <th>Дата</th>
-                                <th>Доменов</th>
-                                <th>Рекомендовано</th>
-                                <th>Статус</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Анализ дропов от 20.05.2025</td>
-                                <td>20.05.2025 14:30</td>
-                                <td>1000</td>
-                                <td>342</td>
-                                <td><span class="badge badge-success">Завершен</span></td>
-                                <td><a href="/reports/report-001" class="btn btn-sm btn-outline">Просмотр</a></td>
-                            </tr>
-                            <tr>
-                                <td>Долгоживущие домены</td>
-                                <td>18.05.2025 10:15</td>
-                                <td>500</td>
-                                <td>125</td>
-                                <td><span class="badge badge-success">Завершен</span></td>
-                                <td><a href="/reports/report-002" class="btn btn-sm btn-outline">Просмотр</a></td>
-                            </tr>
-                            <tr>
-                                <td>Тестовый анализ</td>
-                                <td>15.05.2025 09:45</td>
-                                <td>100</td>
-                                <td>35</td>
-                                <td><span class="badge badge-success">Завершен</span></td>
-                                <td><a href="/reports/report-003" class="btn btn-sm btn-outline">Просмотр</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="stat-card">
+            <div class="stat-value">85%</div>
+            <div class="stat-label">Точность рекомендаций</div>
         </div>
-    </main>
+    </div>
     
-    <%- include('partials/footer') %>
+    <div class="dashboard-row">
+        <div class="dashboard-card chart-card">
+            <h2>Домены по годам регистрации</h2>
+            <div class="chart-container">
+                <canvas id="domainsByYearChart"></canvas>
+            </div>
+        </div>
+        <div class="dashboard-card chart-card">
+            <h2>Статистика рекомендаций</h2>
+            <div class="chart-container">
+                <canvas id="recommendationsChart"></canvas>
+            </div>
+        </div>
+    </div>
     
-    <script>
-        // Инициализация графиков при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            // Получение данных для графиков
-            fetch('/dashboard/chart-data')
-                .then(response => response.json())
-                .then(data => {
-                    // График доменов по годам
-                    const domainsByYearCtx = document.getElementById('domainsByYearChart').getContext('2d');
-                    new Chart(domainsByYearCtx, {
-                        type: 'bar',
-                        data: data.domainsByYear,
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
+    <div class="dashboard-row">
+        <div class="dashboard-card chart-card">
+            <h2>Распределение времени анализа</h2>
+            <div class="chart-container">
+                <canvas id="analysisTimeChart"></canvas>
+            </div>
+        </div>
+        <div class="dashboard-card">
+            <h2>Последние отчеты</h2>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Дата</th>
+                            <th>Доменов</th>
+                            <th>Рекомендовано</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Анализ дропов от 20.05.2025</td>
+                            <td>20.05.2025 14:30</td>
+                            <td>1000</td>
+                            <td>342</td>
+                            <td><span class="badge badge-success">Завершен</span></td>
+                            <td><a href="/reports/report-001" class="btn btn-sm btn-outline">Просмотр</a></td>
+                        </tr>
+                        <tr>
+                            <td>Долгоживущие домены</td>
+                            <td>18.05.2025 10:15</td>
+                            <td>500</td>
+                            <td>125</td>
+                            <td><span class="badge badge-success">Завершен</span></td>
+                            <td><a href="/reports/report-002" class="btn btn-sm btn-outline">Просмотр</a></td>
+                        </tr>
+                        <tr>
+                            <td>Тестовый анализ</td>
+                            <td>15.05.2025 09:45</td>
+                            <td>100</td>
+                            <td>35</td>
+                            <td><span class="badge badge-success">Завершен</span></td>
+                            <td><a href="/reports/report-003" class="btn btn-sm btn-outline">Просмотр</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% const extraScripts = ['/js/components/charts.js']; %>
+
+<script>
+    // Инициализация графиков при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        // Получение данных для графиков
+        fetch('/dashboard/chart-data')
+            .then(response => response.json())
+            .then(data => {
+                // График доменов по годам
+                const domainsByYearCtx = document.getElementById('domainsByYearChart').getContext('2d');
+                new Chart(domainsByYearCtx, {
+                    type: 'bar',
+                    data: data.domainsByYear,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
                             }
                         }
-                    });
-                    
-                    // График статистики рекомендаций
-                    const recommendationsCtx = document.getElementById('recommendationsChart').getContext('2d');
-                    new Chart(recommendationsCtx, {
-                        type: 'doughnut',
-                        data: data.recommendationStats,
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'right',
-                                }
+                    }
+                });
+                
+                // График статистики рекомендаций
+                const recommendationsCtx = document.getElementById('recommendationsChart').getContext('2d');
+                new Chart(recommendationsCtx, {
+                    type: 'doughnut',
+                    data: data.recommendationStats,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
                             }
                         }
-                    });
-                    
-                    // График распределения времени анализа
-                    const analysisTimeCtx = document.getElementById('analysisTimeChart').getContext('2d');
-                    new Chart(analysisTimeCtx, {
-                        type: 'bar',
-                        data: data.analysisTimeDistribution,
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
+                    }
+                });
+                
+                // График распределения времени анализа
+                const analysisTimeCtx = document.getElementById('analysisTimeChart').getContext('2d');
+                new Chart(analysisTimeCtx, {
+                    type: 'bar',
+                    data: data.analysisTimeDistribution,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
                             }
                         }
-                    });
-                })
-                .catch(error => console.error('Ошибка при загрузке данных для графиков:', error));
-        });
-    </script>
-</body>
-</html>
+                    }
+                });
+            })
+            .catch(error => console.error('Ошибка при загрузке данных для графиков:', error));
+    });
+</script>

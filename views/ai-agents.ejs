@@ -1,88 +1,92 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> | Анализатор дропов</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/themes/<%= theme %>.css">
-    <!-- React и Material UI будут загружены через CDN для упрощения -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="theme-<%= theme %>">
-    <%- include('partials/header') %>
+<div class="ai-agents-container">
+    <h1 class="mt-4 mb-4">AI-агенты</h1>
     
-    <main class="container">
-        <h1 class="mt-4 mb-4">AI-агенты</h1>
-        
-        <div class="alert alert-info mb-4">
-            <strong>Информация:</strong> AI-агенты используют машинное обучение для анализа и оценки доменов на основе исторических данных из Wayback Machine.
-        </div>
-        
-        <div class="row">
-            <% agents.forEach(function(agent) { %>
-                <div class="col-md-4 mb-4">
-                    <div class="agent-card">
-                        <div class="agent-card-header">
-                            <h3 class="mb-0"><%= agent.name %></h3>
-                            <span class="agent-status <%= agent.status %>"><%= agent.status === 'active' ? 'Активен' : agent.status === 'training' ? 'Обучается' : 'Неактивен' %></span>
-                        </div>
-                        <div class="agent-card-body">
-                            <p><%= agent.description %></p>
-                            <div class="mt-3 mb-3">
-                                <strong>Последнее обучение:</strong> <%= new Date(agent.lastTrained).toLocaleString() %>
-                            </div>
-                            <div class="mb-3">
-                                <strong>Точность:</strong> <%= (agent.accuracy * 100).toFixed(1) %>%
-                            </div>
-                        </div>
-                        <div class="agent-card-footer">
-                            <a href="/ai-agents/<%= agent.id %>" class="btn btn-primary">Настройки</a>
-                            <% if (agent.status !== 'training') { %>
-                                <form action="/ai-agents/<%= agent.id %>/train" method="POST" class="d-inline">
-                                    <button type="submit" class="btn btn-outline">Обучить</button>
-                                </form>
-                            <% } else { %>
-                                <button class="btn btn-outline" disabled>Обучается...</button>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-            <% }); %>
-        </div>
-        
-        <div class="card mt-4">
-            <div class="card-header">
-                <h3 class="mb-0">Как работают AI-агенты</h3>
-            </div>
-            <div class="card-body">
-                <p>AI-агенты анализируют исторические данные доменов из Wayback Machine и используют машинное обучение для оценки их качества и потенциальной ценности.</p>
-                
-                <h4 class="mt-4">Процесс работы:</h4>
-                <ol>
-                    <li><strong>Сбор данных</strong> - агенты собирают исторические данные о доменах из Wayback Machine</li>
-                    <li><strong>Анализ метрик</strong> - вычисляются ключевые метрики, такие как количество снимков, годы покрытия, интервалы между снимками</li>
-                    <li><strong>Оценка</strong> - на основе обученной модели агенты оценивают качество и потенциальную ценность доменов</li>
-                    <li><strong>Рекомендации</strong> - формируются рекомендации по приобретению доменов</li>
-                </ol>
-                
-                <h4 class="mt-4">Типы агентов:</h4>
-                <ul>
-                    <li><strong>Анализатор качества доменов</strong> - оценивает общее качество домена на основе исторических данных</li>
-                    <li><strong>Предиктор стоимости</strong> - прогнозирует потенциальную стоимость домена</li>
-                    <li><strong>Классификатор тематики</strong> - определяет тематику домена на основе исторического контента</li>
-                </ul>
-                
-                <div class="alert alert-warning mt-4">
-                    <strong>Примечание:</strong> Для достижения наилучших результатов рекомендуется регулярно обучать агентов на новых данных.
-                </div>
+    <div class="ai-agents-intro">
+        <p>Используйте интеллектуальных агентов для автоматизации анализа и получения персонализированных рекомендаций</p>
+    </div>
+    
+    <div class="agents-grid">
+        <div class="agent-card">
+            <div class="agent-icon analyzer-icon"></div>
+            <h3>Анализатор потенциала</h3>
+            <p>Оценивает потенциал домена на основе исторических данных и текущих трендов</p>
+            <div class="agent-actions">
+                <a href="/ai-agents/analyzer" class="btn btn-primary">Использовать</a>
+                <button class="btn btn-outline btn-sm">Настройки</button>
             </div>
         </div>
-    </main>
+        
+        <div class="agent-card">
+            <div class="agent-icon selector-icon"></div>
+            <h3>Селектор доменов</h3>
+            <p>Автоматически отбирает наиболее перспективные домены из списка</p>
+            <div class="agent-actions">
+                <a href="/ai-agents/selector" class="btn btn-primary">Использовать</a>
+                <button class="btn btn-outline btn-sm">Настройки</button>
+            </div>
+        </div>
+        
+        <div class="agent-card">
+            <div class="agent-icon advisor-icon"></div>
+            <h3>Советник по нишам</h3>
+            <p>Рекомендует ниши и категории для доменов на основе их характеристик</p>
+            <div class="agent-actions">
+                <a href="/ai-agents/advisor" class="btn btn-primary">Использовать</a>
+                <button class="btn btn-outline btn-sm">Настройки</button>
+            </div>
+        </div>
+        
+        <div class="agent-card">
+            <div class="agent-icon monitor-icon"></div>
+            <h3>Монитор дропов</h3>
+            <p>Отслеживает новые дропы и уведомляет о перспективных доменах</p>
+            <div class="agent-actions">
+                <a href="/ai-agents/monitor" class="btn btn-primary">Использовать</a>
+                <button class="btn btn-outline btn-sm">Настройки</button>
+            </div>
+        </div>
+    </div>
     
-    <%- include('partials/footer') %>
-</body>
-</html>
+    <div class="agent-activity">
+        <h2>Активность агентов</h2>
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon analyzer-icon-small"></div>
+                <div class="activity-details">
+                    <h4>Анализатор потенциала</h4>
+                    <p>Завершен анализ домена example.com</p>
+                    <span class="activity-time">2 часа назад</span>
+                </div>
+                <div class="activity-actions">
+                    <a href="/reports/domain/example.com" class="btn btn-sm btn-outline">Отчет</a>
+                </div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon selector-icon-small"></div>
+                <div class="activity-details">
+                    <h4>Селектор доменов</h4>
+                    <p>Отобрано 125 доменов из 500</p>
+                    <span class="activity-time">1 день назад</span>
+                </div>
+                <div class="activity-actions">
+                    <a href="/reports/batch/002" class="btn btn-sm btn-outline">Отчет</a>
+                </div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon monitor-icon-small"></div>
+                <div class="activity-details">
+                    <h4>Монитор дропов</h4>
+                    <p>Обнаружено 15 новых перспективных доменов</p>
+                    <span class="activity-time">3 дня назад</span>
+                </div>
+                <div class="activity-actions">
+                    <a href="/reports/monitor/001" class="btn btn-sm btn-outline">Просмотр</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% const extraScripts = ['/js/components/ai-agents.js']; %>

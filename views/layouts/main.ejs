@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Анализатор дроп-доменов' %></title>
+    <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'Современный инструмент для анализа дроп-доменов через Wayback Machine' %>">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/themes/<%= locals.theme || 'light' %>.css">
+</head>
+<body class="theme-<%= locals.theme || 'light' %>">
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="/">
+                        <span class="logo-text">DropAnalyzer</span>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="/" class="<%= locals.currentPath === '/' ? 'active' : '' %>">Главная</a></li>
+                        <li><a href="/dashboard" class="<%= locals.currentPath === '/dashboard' ? 'active' : '' %>">Панель управления</a></li>
+                        <li><a href="/analysis" class="<%= locals.currentPath === '/analysis' ? 'active' : '' %>">Анализ доменов</a></li>
+                        <li><a href="/reports" class="<%= locals.currentPath === '/reports' ? 'active' : '' %>">Отчеты</a></li>
+                        <li><a href="/ai-agents" class="<%= locals.currentPath === '/ai-agents' ? 'active' : '' %>">AI-агенты</a></li>
+                    </ul>
+                </nav>
+                <div class="header-actions">
+                    <form action="/theme/toggle" method="POST">
+                        <button type="submit" class="theme-toggle">
+                            <span class="theme-icon">🌓</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <%- body %>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="logo-text">DropAnalyzer</span>
+                    <p>Современный инструмент для анализа дроп-доменов</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h3>Навигация</h3>
+                        <ul>
+                            <li><a href="/">Главная</a></li>
+                            <li><a href="/dashboard">Панель управления</a></li>
+                            <li><a href="/analysis">Анализ доменов</a></li>
+                            <li><a href="/reports">Отчеты</a></li>
+                            <li><a href="/ai-agents">AI-агенты</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>Ресурсы</h3>
+                        <ul>
+                            <li><a href="/about">О проекте</a></li>
+                            <li><a href="/static">Статическая версия</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 DropAnalyzer. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/hash-navigation.js"></script>
+    <% if (typeof extraScripts !== 'undefined') { %>
+        <% extraScripts.forEach(function(script) { %>
+            <script src="<%= script %>"></script>
+        <% }); %>
+    <% } %>
+</body>
+</html>
