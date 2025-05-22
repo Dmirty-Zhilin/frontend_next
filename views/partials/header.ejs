@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= typeof title !== 'undefined' ? title : 'Главная' %> | DropAnalyzer</title>
+    <title><%= title %> | DropAnalyzer</title>
     
     <!-- Инлайновые стили для гарантированного отображения -->
     <style>
@@ -21,7 +21,6 @@
             --error-color: #e74c3c;
             --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background-color: var(--bg-primary);
@@ -30,13 +29,11 @@
             margin: 0;
             padding: 0;
         }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
-
         /* Заголовок */
         .main-header {
             background-color: var(--bg-primary);
@@ -46,31 +43,26 @@
             top: 0;
             z-index: 100;
         }
-
         .main-header .container {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--accent-color);
             text-decoration: none;
         }
-
         .main-nav ul {
             display: flex;
             list-style: none;
             margin: 0;
             padding: 0;
         }
-
         .main-nav li {
             margin-left: 20px;
         }
-
         .main-nav a {
             color: var(--text-primary);
             text-decoration: none;
@@ -79,21 +71,17 @@
             border-radius: 4px;
             transition: background-color 0.3s;
         }
-
         .main-nav a:hover {
             background-color: var(--bg-secondary);
         }
-
         .main-nav a.active {
             color: var(--accent-color);
             background-color: var(--bg-secondary);
         }
-
         /* Основной контент */
         .main-content {
             padding: 40px 0;
         }
-
         /* Карточки */
         .card {
             background-color: var(--bg-primary);
@@ -102,19 +90,16 @@
             padding: 20px;
             margin-bottom: 20px;
         }
-
         .card-header {
             margin-bottom: 15px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
         }
-
         .card-title {
             margin: 0;
             font-size: 1.25rem;
             color: var(--text-primary);
         }
-
         /* Кнопки */
         .btn {
             display: inline-block;
@@ -127,12 +112,10 @@
             text-decoration: none;
             border: none;
         }
-
         .btn-primary {
             background-color: var(--accent-color);
             color: white;
         }
-
         .btn-primary:hover {
             background-color: var(--accent-hover);
         }
@@ -145,17 +128,13 @@
     <!-- Шрифты -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- React и Chart.js через CDN -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Chart.js через CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Основной JavaScript -->
     <script src="/js/main.js" defer></script>
-    <!-- Хеш-навигация для SPA -->
-    <script src="/js/hash-navigation.js" defer></script>
-    <!-- Переключатель темы -->
-    <script src="/js/theme-switcher.js" defer></script>
+    <!-- Простая навигация без SPA -->
+    <script src="/js/simple-navigation.js" defer></script>
 </head>
 <body data-theme="<%= theme %>" class="theme-dependent">
     <header class="main-header theme-dependent">
